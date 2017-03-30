@@ -1,5 +1,8 @@
 rm(list = ls())
 
+# For EC-L Only
+
+# Works
 openReportFile <- function(filename) {
     # opens and reads files
     #df <- read.delim(filename, header = FALSE)
@@ -9,6 +12,7 @@ openReportFile <- function(filename) {
     return (fileInfo)
 }
 
+# Works
 generateFileNames <- function(root, indexes) {
     # filename extraction (note: you may need to write your own!)
     out = vector()
@@ -18,10 +22,10 @@ generateFileNames <- function(root, indexes) {
     return (out)
 }
 
-# gets rid of trailing whitespace
-trim <- function(item) gsub("\\s+$", "", item) 
-#trim <- function(item) gsub("^\\s+|\\s+$", "", item) leading and trailing whitespace
+# Works 
+trim <- function(item) gsub("^\\s+|\\s+$", "", item) #leading and trailing whitespace
 
+# Works
 getNodes <- function(filename) {
     # get the nodes from a file with node names separated by "\n"
     fileHandle = file(filename, 'r')
@@ -51,7 +55,7 @@ getNetworks <- function(fnames) {
     return (networks)
 }
 
-getNetsAll <- function(files, outfile, os, re) {
+getNetsAll <- function(files, outfile) {
     # Purpose: get all of the networks from the BANJO files
     # Banjo files should all be saved in the same directory 
     scores = vector()
@@ -183,44 +187,6 @@ getMaxScore <- function(listx) {
     return (max(scores))
 }
 
-bvalCalculator <- function(infile, e) {
-    # function calculates the b-values    
-    # initialize variables 
-    all.scores = vector()
-    uniq.scores = vector()
-    combined_probabilities = 0.0
-    score.changes = vector()
-    bval = vector()
-    bval_mapper = vector()
-    # executable portion
-    # first get the unique scores and max value 
-    scores = grabScores(infile)
-    for (score in scores) {
-        all.scores[score] = 1
-    }
-    uniq.scores = all.scores
-    uniq.scores = sort(uniq.scores)
-    maxscore = getMaxScore(uniq.scores)
-    # Step one of computation... compute score change
-    for (key in 1:len(uniq.scores)) {
-        score.changes[key] = e^(as.numeric(uniq.scores[key]) - maxscore)
-        combined_probabilities = combined_probabilities + score.changes[key]
-    }
-    #step 2: generate right-tail density for each score cutoff
-    for (key in 1:len(uniq.scores)) {
-        bval = 0.0
-        for (key2 in (len(uniq.scores)-1):1) {
-            if (as.numeric(uniq.scores[key]) > as.numeric(uniq.scores[key2])) {
-                bval = bval + (score.changes[key2] / combined_probabilities)
-            }
-            else {
-                break
-            }
-        }
-        bval_mapper[toString(uniq.scores[key])] = bval
-    }
-    return (bval_mapper)
-}
 
 percent_appear <- function(networks = vector(), count = 0, edgePercent = 1.0) {
     # function generates the decisions for whether an edge should be included or not
@@ -251,46 +217,7 @@ percent_appear <- function(networks = vector(), count = 0, edgePercent = 1.0) {
     return (final_edges)
 }
 
-bvalConsensus <- function(score, infile, edgePercent) {
-    # function generates the consensus network given the b-values
-    # note: function is a wrapper for the percent_appear function 
-    consensus.edges = vector() # tuple
-    y = 0
-    include_edges = vector() # tuple
-    z = 0
-    fileInfo = openReportFile(infile)
-    for (strings in fileInfo) {
-        y = y + 1
-        scorei = 0
-        edgestr = ""
-        strings = toString(strings)
-        strings = trim(strings)
-        if (!(string == "")) {
-            info  = strsplit(strings, ";")
-            scorei = info[1]
-            edgestr = info[2]
-            if (as.numeric(scorei) >= as.numeric(score)) {
-                z = z + 1
-                edges = vector()
-                edges = strsplit(edgestr, ",")
-                for (edge in edges) {
-                    if (!(edge %in% include_edges)) {
-                        include_edges[edge] = 0
-                    }
-                    include_edges[edge] = include_edges[edge] + 1
-                }
-            }
-            else {
-                consensus.edges[score] = ""
-                consensus.edges[score] = percent_appear(include_edges, z, edgePercent) 
-            }
-        }
-        else if (!(score %in% consensus.edges)) {
-            consensus.edges[score] = percent_appear(include_edges, z, edgePercent)
-        }
-    }
-    return (consensus.edges[score])
-}
+
 
 readEdgeInformation <- function(filename, nodes, writer) {
     # function generates the formatted information for the c-value output
@@ -332,25 +259,6 @@ readEdgeInformation <- function(filename, nodes, writer) {
     return (cutoff.array) # Returns a list
 }
 
-bvalWrapper <- function(outputBvals, bvalFile, netfile2, edgePercent) {
-    # main wrapper for b-value computation and output 
-    ouput.array = vector()
-    scores.n = vector()
-    #scores.n <- outputBvals.keys()
-    scores.n = outputBvals
-    scores.n = sort(scores.n)
-    for (score in scores.n) {
-        edge.info = bval.consensus(toString(score), netfile2, edgePercent)
-        stringx = paste0(toString(score), "\t", toString(outputBvals[toString(score)]), "\t",
-                          paste(edge.info, sep = ","), "\n")
-        output.array = append(output.array, stringx)
-    }
-    fout = file(bvalFile, open = "wb")
-    write.table(file = fout, x = "Score\tBval\tEdges\n")
-    write.table(file = fout, x = paste(outputArray, sep = ""), "\n")
-    close(fout)
-    return (1)
-}
 
 cvalWrapper <- function(bvalFile, cvalFile, nodes) {
     # main wrapper for c-value computation and output  
