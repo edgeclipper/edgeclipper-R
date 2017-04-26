@@ -1,6 +1,6 @@
 rm(list = ls())
 
-# Works
+
 openReportFile <- function(filename) {
     # opens and reads files
     #df <- read.delim(filename, header = FALSE)
@@ -10,7 +10,7 @@ openReportFile <- function(filename) {
     return (fileInfo)
 }
 
-# Works
+
 generateFileNames <- function(root, indexes) {
     # filename extraction (note: you may need to write your own!)
     out = vector()
@@ -20,10 +20,10 @@ generateFileNames <- function(root, indexes) {
     return (out)
 }
 
-# Works 
+
 trim <- function(item) gsub("^\\s+|\\s+$", "", item) #leading and trailing whitespace
 
-# Works
+
 getNodes <- function(filename) {
     # get the nodes from a file with node names separated by "\n"
     fileHandle = file(filename, 'r')
@@ -233,16 +233,16 @@ avalCalculator <- function(infile, e) {
 percent_appear <- function(networks = list(), count = 0, edgePercent = 1.0) {
     # function generates the decisions for whether an edge should be included or not
     # major assumption is that an edge must be present with freq = 1.0 to include it 
-    sort.edges = list() # tuple
+    sort.edges = list() 
     final_edges = vector()
     count = edgePercent * count
-    for (edge in names(networks)){ # Networks.Key() fix b/c Python
+    for (edge in names(networks)){ 
         nodes = strsplit(x = edge, split = "->")
         nodes = order(nodes)
         edger = paste0(toString(nodes[1]),"->",toString(nodes[2]))
         sort.edges[[edger]] = 1
     }
-    for (edge in names(sort.edges)) { # sort.edges.keys() fix b/c Python
+    for (edge in names(sort.edges)) {
         num.occur = 0
         nodes = strsplit(edge, "->")
         edge2 = paste0(toString(nodes[2]),"->",toString(nodes[1]))
@@ -262,9 +262,9 @@ percent_appear <- function(networks = list(), count = 0, edgePercent = 1.0) {
 bvalConsensus <- function(score, infile, edgePercent) {
     # function generates the consensus network given the b-values
     # note: function is a wrapper for the percent_appear function 
-    consensus.edges = list() # tuple
+    consensus.edges = list()
     y = 0
-    include_edges = list() # tuple
+    include_edges = list() 
     z = 0
     fileInfo = openReportFile(infile)
     for (strings in fileInfo) {
