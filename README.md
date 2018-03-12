@@ -3,7 +3,7 @@ R version of Edgeclipper software.
 
 EdgeClipper is a posterior probability-based algorithm for identification of consensus Bayesian networks and edge prioritization. EdgeClipper-R is an R version of software that implements the EdgeClipper algorithm. The EdgeClipper algorithm and software are developed by a team at the Univesity of Michigan, Ann Arbor, MI, USA. 
 
-Python version of Edgeclipper software can be found [here][1]. 
+A Python version of Edgeclipper software can be found [here][1]. 
 
 ## Functions
 
